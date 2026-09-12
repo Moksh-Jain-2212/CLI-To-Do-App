@@ -1,11 +1,32 @@
 use std::io; 
-use std::collections::HashMap;
 
 #[derive(Debug)]
 struct Task {
     name_of_task: String,
     task_id: u32,
     is_completed: bool,
+}
+
+impl Task {
+    pub fn mark_task_as_completed(&mut self) {
+        self.is_completed = true;
+    }
+
+    pub fn show_whether_the_task_is_pending_or_completed(&mut self) {
+        println!("{}", self.is_completed);
+    }
+}
+
+fn take_input() -> usize {
+    let mut taskId = String::new();
+
+    io::stdin()
+            .read_line(&mut taskId)
+            .expect("Failed to take taskId as input");
+
+    let taskID:usize = taskId.trim().parse().expect("Please enter a number");
+
+    taskID
 }
 
 fn display_all_features(task_list: &mut Vec<Task>) {
@@ -29,13 +50,7 @@ fn display_all_features(task_list: &mut Vec<Task>) {
 
     while true  
     {
-        let mut feat_num = String::new();
-
-        io::stdin()
-            .read_line(&mut feat_num)
-            .expect("Failed to take input");
-
-        let choice: u32 = feat_num.trim().parse().expect("Please enter a number");
+        let mut choice: u32 = take_input().try_into().unwrap();
 
         if choice == 0 {
             add_a_new_task(task_list);
@@ -46,11 +61,11 @@ fn display_all_features(task_list: &mut Vec<Task>) {
             break;
         }
         else if choice == 2 {
-            mark_a_test_as_completed();
+            mark_a_task_as_completed(task_list);
             break;
         }
         else if choice == 3  {
-            delete_a_task();
+            delete_a_task(task_list);
             break;
         }
         else if choice == 4 {
@@ -58,7 +73,7 @@ fn display_all_features(task_list: &mut Vec<Task>) {
             break;
         }
         else if choice == 5  {
-            show_whether_each_task_is_pending_or_completed();
+            show_whether_each_task_is_pending_or_completed(task_list);
             break;
         }
         else {
@@ -83,7 +98,7 @@ fn add_a_new_task(task_list: &mut Vec<Task>) {
     task_list.push(
         Task {
             name_of_task: task_name,
-            task_id: (task_list.len()+1) as u32,
+            task_id: (task_list.len()) as u32,
             is_completed: false,
         }
     );
@@ -106,39 +121,59 @@ fn mark_a_task_as_completed(task_list: &mut Vec<Task>) {
     println!("Enter the task_id");
 
     while true {    
-        let mut taskId = String::new();
+        let taskID = take_input();
 
-        io::stdin()
-            .read_line(&mut taskId)
-            .expect("Failed to take taskId as input");
-
-        let taskID:u32 = taskId.trim().parse().expect("Please enter a number");
-
-        if taskID > (task_list.len() as u32) {
+        if taskID >= ((task_list.len() as u32)).try_into().unwrap() {
             continue;
         }
-        
-        for tsk in task_list.iter() {
-            if taskID == tsk.task_id {
-                tsk.is_completed = true;
-                break;
-            }
-        }
 
+        task_list[taskID].mark_task_as_completed();
+        
+        break;
     }
 
+    display_all_features(task_list);
 }
 
-fn delete_a_task() {
+fn delete_a_task(task_list: &mut Vec<Task>) {
+    println!("Enter the task_id you want to delete");
 
+    while true {    
+        let taskID = take_input();
+
+        if taskID >= ((task_list.len() as u32)).try_into().unwrap() {
+            continue;
+        }
+
+        task_list.remove(taskID);
+        
+        break;
+    }
+
+    display_all_features(task_list);
 }
 
 fn exit_the_application() {
-
+    panic!("Exit the application");
 }
 
-fn show_whether_each_task_is_pending_or_completed() {
+fn show_whether_each_task_is_pending_or_completed(task_list: &mut Vec<Task>) {
 
+    println!("Enter the task_id you want to see");
+
+    while true {    
+        let taskID = take_input();
+
+        if taskID >= ((task_list.len() as u32)).try_into().unwrap() {
+            continue;
+        }
+
+        task_list[taskID].show_whether_the_task_is_pending_or_completed();
+        
+        break;
+    }
+
+    display_all_features(task_list);
 }
 
 fn main() {
@@ -146,9 +181,5 @@ fn main() {
     let mut task_list: Vec<Task> = Vec::new();
 
     display_all_features(&mut task_list);
-
-    
-
-
 
 }
